@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      UserRole
+  transactions Transaction[]
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  kode_barang String   @unique
+  nama_barang String
+  kategori    String
+  lokasi      String
+  stok        Int
+  foto        String?
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  item        Item     @relation(fields: [itemId], references: [id])
+  itemId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  tipe        TransactionType
+  jumlah      Int
+  tanggal     DateTime @default(now())
+  keterangan  String?
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+enum TransactionType {
+  MASUK
+  KELUAR
+}
